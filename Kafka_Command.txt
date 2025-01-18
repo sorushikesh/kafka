@@ -1,0 +1,36 @@
+-List Topics:
+    docker exec -it <kafka-container-name> kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+-Describe a Topic:
+    docker exec -it <kafka-container-name> kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic <topic-name>
+
+-Create a Topic:
+    docker exec -it <kafka-container-name> kafka-topics.sh --bootstrap-server localhost:9092 --create --topic <topic-name> --partitions 3 --replication-factor 1
+
+- Produce Messages
+	To send messages to a topic:
+		docker exec -it <kafka-container-name> kafka-console-producer.sh --bootstrap-server localhost:9092 --topic <topic-name>
+
+- Consume Messages
+	To consume messages from a topic:
+		docker exec -it <kafka-container-name> kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic <topic-name> --from-beginning
+
+- List Consumer Groups
+	To list all consumer groups:
+		docker exec -it <kafka-container-name> kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+- Describe a Consumer Group
+	To describe a consumer group and see lag details:
+		docker exec -it <kafka-container-name> kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group <group-id>
+
+- Monitor Kafka Broker
+	To verify the Kafka broker is running and check API versions:
+		docker exec -it <kafka-container-name> kafka-broker-api-versions.sh --bootstrap-server localhost:9092
+
+- Test Offsets
+	To fetch the latest offsets for a topic:
+		docker exec -it <kafka-container-name> kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092 --topic <topic-name> --time -1
+
+- Update Topic Configurations
+	To alter a topic configuration:
+		docker exec -it <kafka-container-name> kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name <topic-name> --alter --add-config <key=value>
