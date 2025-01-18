@@ -1,8 +1,10 @@
 package com.kafka.controller;
 
+import com.kafka.dto.MessageResponse;
 import com.kafka.service.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,15 +17,16 @@ public class MessageProducerController {
 
     private final MessageService messageService;
 
+    @Value("${spring.kafka.consumer.topic-name}")
+    private String topic;
+
     public MessageProducerController(MessageService messageService) {
         this.messageService = messageService;
     }
 
     @GetMapping("/produce")
-    public ResponseEntity<String> produceMessage() {
-        String message = messageService.generateRandomMessage();
-        logger.info("Generated Message: {}", message);
-        messageService.sendMessage(message);
-        return ResponseEntity.status(HttpStatus.OK).body("Message sent to topic: " + message);
+    public ResponseEntity<MessageResponse> produceMessage() {
+        MessageResponse response = messageService.sendRandomMessage(topic);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
