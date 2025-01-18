@@ -1,7 +1,8 @@
 package com.kafka.service;
 
-public interface MessageService {
-    String generateRandomMessage();
+import com.kafka.dto.MessageResponse;
 
-    void sendMessage(String message);
+public interface MessageService {
+
+    MessageResponse sendRandomMessage(String topic);
 }

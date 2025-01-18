@@ -5,4 +5,7 @@ spring:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: kafka-demo-group
-      topic-name: kafka-demo-topic
+    topics:
+      happy: kafka-demo-topic-happy
+      sad: kafka-demo-topic-sad
+      neutral: kafka-demo-topic-neutral
