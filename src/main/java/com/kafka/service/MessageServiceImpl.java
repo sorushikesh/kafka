@@ -1,11 +1,14 @@
 package com.kafka.service;
 
+import com.kafka.config.KafkaTopicsConfig;
 import com.kafka.dto.MessageResponse;
-import com.kafka.util.RandomMessageUtil;
+import com.kafka.util.MoodBasedMessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -13,37 +16,28 @@ public class MessageServiceImpl implements MessageService {
     private static final Logger logger = LoggerFactory.getLogger(MessageServiceImpl.class);
 
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTopicsConfig kafkaTopicsConfig;
 
-    public MessageServiceImpl(KafkaTemplate<String, String> kafkaTemplate) {
+    public MessageServiceImpl(KafkaTemplate<String, String> kafkaTemplate, KafkaTopicsConfig kafkaTopicsConfig) {
         this.kafkaTemplate = kafkaTemplate;
+        this.kafkaTopicsConfig = kafkaTopicsConfig;
     }
 
     @Override
-    public String generateRandomMessage() {
-        return RandomMessageUtil.getRandomMessage();
-    }
-
-    @Override
-    public boolean sendMessage(String message, String topic) {
-        try {
-            kafkaTemplate.send(topic, message).get();
-            return true;
-        } catch (Exception e) {
-            logger.error("Error sending message to Kafka topic: {}", e.getMessage());
-            return false;
+    public MessageResponse sendRandomMessage(String mood) {
+        Map<String, String> topicMappings = kafkaTopicsConfig.getTopics();
+        String topic = topicMappings.getOrDefault(mood.toLowerCase(), null);
+        if (topic == null) {
+            throw new IllegalArgumentException("Invalid mood: " + mood);
         }
-    }
-
-    @Override
-    public MessageResponse sendRandomMessage(String topic) {
         try {
 
-            String message = RandomMessageUtil.getRandomMessage();
+            String message = MoodBasedMessageUtil.getRandomMessageByMood(mood);
             kafkaTemplate.send(topic, message).get();
             return new MessageResponse(message, topic, true);
         } catch (Exception e) {
-            logger.error("Error sending random message to Kafka topic: {}", e.getMessage());
-            return new MessageResponse(null, topic, false);
+            logger.error("Error sending message to Kafka topic: {}", e.getMessage());
+            return new MessageResponse(null, null, false);
         }
     }
 }
